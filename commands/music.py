@@ -2,9 +2,10 @@ import discord
 from discord import VoiceClient
 from discord.ext import commands
 from typing import Dict
+from ytdlp.yt_dlp import YoutubeDL
 
 
-class Join(commands.Cog):
+class Music(commands.Cog):
     def __init__(self, bot_: discord.Bot):
         self.bot = bot_
         self.isPlaying = False
@@ -29,16 +30,15 @@ class Join(commands.Cog):
         else:
             await ctx.respond("I'm not even in a channel")
 
-    @commands.slash_command(name="play", description="play music")
-    async def play(self, ctx: discord.ApplicationContext):
+    @commands.slash_command(name="play2", description="play music")
+    async def play_static(self, ctx: discord.ApplicationContext):
         voice_channel = ctx.author.voice.channel
         guild_id = ctx.author.guild.id
         voice_client = self.voice_client_dict.get(guild_id)
 
         if voice_channel is not None:
             if voice_client is None:
-                self.voice_client_dict[guild_id] = await voice_channel.connect()
-                voice_client = self.voice_client_dict.get(guild_id)
+                self.voice_client_dict[guild_id] = voice_client = await voice_channel.connect()
             else:
                 if voice_client.channel is not voice_channel:
                     if voice_client.is_playing():
@@ -55,6 +55,10 @@ class Join(commands.Cog):
         else:
             await ctx.respond("you need to be in a voice channel to do this")
 
+    @commands.slash_command(name="play", description="play from a URL")
+    async def play(self, ctx: discord.ApplicationContext):
+        pass
+
 
 def setup(bot):
-    bot.add_cog(Join(bot))
+    bot.add_cog(Music(bot))
