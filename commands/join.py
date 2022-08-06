@@ -12,9 +12,9 @@ class Join(commands.Cog):
 
         if voice is not None:
             await voice.channel.connect()
-            await ctx.send(f"Connected and bound to {voice.channel.mention}!")
+            await ctx.respond(f"Connected and bound to {voice.channel.mention}!")
         else:
-            await ctx.send(
+            await ctx.respond(
                 "you need to be in a voice channel to use this"
             )
 
@@ -23,9 +23,24 @@ class Join(commands.Cog):
         voice = ctx.voice_client
         if voice is not None:
             await voice.disconnect(force=False)
-            await ctx.send(f"Left the VC")
+            await ctx.respond(f"Left the VC")
         else:
-            await ctx.send("I'm not even in a channel")
+            await ctx.respond("I'm not even in a channel")
+
+    @commands.slash_command(name="play", description="play music")
+    async def play(self, ctx: discord.ApplicationContext):
+        voice_channel = ctx.author.voice.channel
+        if voice_channel is not None:
+            vc = await voice_channel.connect()
+            vc.play(
+                discord.FFmpegPCMAudio(
+                    executable="ffmpeg.exe",
+                    source=r"./media/test.mp3"
+                )
+            )
+            await ctx.respond(f"Connected to {voice_channel.name}, playing audio")
+        else:
+            await ctx.respond("you need to be in a voice channel to do this")
 
 
 def setup(bot):
