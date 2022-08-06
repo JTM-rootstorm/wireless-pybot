@@ -2,7 +2,7 @@ import discord
 from discord import VoiceClient
 from discord.ext import commands
 from typing import Dict
-from ytdlp.yt_dlp import YoutubeDL
+import youtubedl
 
 
 class Music(commands.Cog):
@@ -56,8 +56,9 @@ class Music(commands.Cog):
             await ctx.respond("you need to be in a voice channel to do this")
 
     @commands.slash_command(name="play", description="play from a URL")
-    async def play(self, ctx: discord.ApplicationContext):
-        pass
+    async def play(self, ctx: discord.ApplicationContext, url: str):
+        await ctx.respond(f"url: {url}")
+        youtubedl.get_video(url)
 
 
 def setup(bot):
