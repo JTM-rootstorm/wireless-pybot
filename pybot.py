@@ -17,5 +17,5 @@ async def on_ready():
 async def hello(ctx):
     await ctx.respond("hey")
 
-
+bot.load_extension("commands.join")
 bot.run(os.getenv('TOKEN'))
