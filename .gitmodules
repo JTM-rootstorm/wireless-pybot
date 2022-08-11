@@ -1,3 +1,0 @@
-[submodule "yt-dlp"]
-	path = yt-dlp
-	url = git@github.com:yt-dlp/yt-dlp.git
