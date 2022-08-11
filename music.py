@@ -57,8 +57,9 @@ class Music(commands.Cog):
 
     @commands.slash_command(name="play", description="play from a URL")
     async def play(self, ctx: discord.ApplicationContext, url: str):
-        await ctx.respond(f"url: {url}")
-        youtubedl.get_video(url)
+        await ctx.respond(f"Grabbing video...")
+        (video_title, video_duration, file_path) = youtubedl.get_video(url)
+        await ctx.respond(f"Got \"{video_title}\", with duration of {video_duration}. It has been saved to {file_path}")
 
 
 def setup(bot):
