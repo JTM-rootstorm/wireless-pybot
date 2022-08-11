@@ -1,4 +1,9 @@
 import json
+import sys
+
+# we're going to ignore the horrible things I have to do here
+sys.path.append("./yt-dlp")
+# noinspection PyUnresolvedReferences
 import yt_dlp
 
 
