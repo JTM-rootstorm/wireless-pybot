@@ -1,4 +1,4 @@
-class Song:
+class MediaInfo:
     """Basically just a big shell for data"""
     def __init__(self, media_path, video_title, duration):
         self.mediaPath = media_path
