@@ -8,6 +8,15 @@ dotenv_path = Path('./venv/.env')
 load_dotenv(dotenv_path=dotenv_path)
 bot = discord.Bot(debug_guilds=[1005477540456058901])
 
+mediaPath = os.getenv("MEDIA_PATH")
+downloadPath = os.getenv("DOWNLOAD_PATH")
+
+if not os.path.exists(mediaPath):
+    os.makedirs(mediaPath)
+
+if not os.path.exists(downloadPath):
+    os.makedirs(downloadPath)
+
 
 @bot.event
 async def on_ready():

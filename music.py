@@ -58,6 +58,11 @@ class Music(commands.Cog):
         else:
             await ctx.respond("you need to be in a voice channel to do this")
 
+    @commands.slash_command(name="playlist", description="figure out yt playlits")
+    async def playlist(self, ctx: discord.ApplicationContext, url: str):
+        await ctx.respond("doing some background work")
+        youtubedl.output_trash(url)
+
 
 def setup(bot):
     bot.add_cog(Music(bot))
