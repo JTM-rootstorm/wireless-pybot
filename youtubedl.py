@@ -1,3 +1,4 @@
+import concurrent.futures
 import datetime
 import json
 import os
@@ -8,9 +9,9 @@ from media_info import MediaInfo
 download_path = os.getenv("DOWNLOAD_PATH")
 
 ydl_opts = {
-        'format': 'mp4',
-        'outtmpl': f"{download_path}/%(title)s.%(ext)s"
-    }
+    'format': 'mp4',
+    'outtmpl': f"{download_path}/%(title)s.%(ext)s"
+}
 
 
 def get_video(url: str):
@@ -28,29 +29,25 @@ def get_video(url: str):
 def output_trash(url: str):
     sanitized_info = extract_json(url)
     if "youtube" in sanitized_info['webpage_url']:
-        download_type = sanitized_info['_type']
-        if download_type is "video":
-            download_video(url)
-        elif download_type is "playlist":
-            (video_list, media_info_list) = process_playlist(sanitized_info)
-            download_video(video_list)
-        else:
-            pass
+        return process_playlist(sanitized_info)
+
+    return None
 
 
-def process_playlist(json_info) -> (list, list[MediaInfo]):
-    video_list = json_info['entries']
-    video_urls = []
+def process_playlist(url: str) -> list[MediaInfo]:
+    json_info = extract_json(url)
+
+    url_type = json_info['_type']
     videos: list[MediaInfo] = []
-    for item in video_list:
-        video_urls.append(item['webpage_url'])
 
-        (video_title, video_duration, file_path) = (item["title"],
-                                                    datetime.timedelta(seconds=int(item["duration"])),
-                                                    item["requested_downloads"][0]["filepath"])
-        videos.append(MediaInfo(file_path, video_title, video_duration))
+    if url_type is "playlist":
+        video_list = json_info['entries']
+        for item in video_list:
+            videos.append(create_media_info(item))
+    else:
+        videos.append(create_media_info(json_info))
 
-    return video_urls, videos
+    return videos
 
 
 def extract_json(url: str):
@@ -59,15 +56,21 @@ def extract_json(url: str):
         return sanitize_json(ydl.sanitize_info(info))
 
 
-def download_video(url):
-    url_list = []
-    if url is not list:
-        url_list.append(url)
-    else:
-        url_list = url
+def download_video(media_info: MediaInfo) -> MediaInfo | None:
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download(media_info.url)
+            return media_info
+    except (concurrent.futures.CancelledError, concurrent.futures.TimeoutError):
+        return None
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download(url_list)
+
+def create_media_info(video_info) -> MediaInfo:
+    (video_title, video_duration, file_path, web_url) = (video_info["title"],
+                                                         datetime.timedelta(seconds=int(video_info["duration"])),
+                                                         video_info["requested_downloads"][0]["filepath"],
+                                                         video_info['webpage_url'])
+    return MediaInfo(file_path, video_title, video_duration, web_url)
 
 
 def sanitize_json(_input):
